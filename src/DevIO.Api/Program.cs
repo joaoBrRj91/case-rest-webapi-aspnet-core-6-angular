@@ -1,11 +1,24 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using DevIO.Api.Configuration;
+using DevIO.Data.Context;
+using Microsoft.EntityFrameworkCore;
 
-// Add services to the container.
+var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+
+builder.Services.AddControllers().ConfigureApiBehaviorOptions(x => { x.SuppressMapClientErrors = true; }); ;
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add services to the container.
+builder.Services.AddDbContext<MeuDbContext>(option =>
+{
+    option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSqlServerConnection"));
+});
+
+builder.Services.AddAutoMapper(typeof(Program));
+
+builder.Services.ResolveDependencies();
 
 var app = builder.Build();
 
