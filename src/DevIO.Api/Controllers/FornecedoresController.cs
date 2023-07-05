@@ -8,7 +8,7 @@ namespace DevIO.Api.Controllers
 {
 
     [Route("api/[controller]")]
-    [ApiConventionType(typeof(DefaultApiConventions))]
+    //[ApiConventionType(typeof(DefaultApiConventions))]
     public class FornecedoresController : MainController
     {
         private readonly IFornecedorRepository fornecedorRepository;
@@ -26,7 +26,7 @@ namespace DevIO.Api.Controllers
         }
 
         [HttpGet]
-        //[ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Get))]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Get))]
         public async Task<ActionResult<IEnumerable<FornecedorViewModel>>> ObterTodos()
         {
 
@@ -37,6 +37,7 @@ namespace DevIO.Api.Controllers
         }
 
         [HttpGet("{id:guid}")]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Get))]
         public async Task<ActionResult<IEnumerable<FornecedorViewModel>>> ObterPorId(Guid id)
         {
             var fornecedor = mapper.Map<FornecedorViewModel>
@@ -48,6 +49,7 @@ namespace DevIO.Api.Controllers
         }
 
         [HttpPost]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Post))]
         public async Task<ActionResult<FornecedorViewModel>> Adicionar(FornecedorViewModel fornecedorViewModel)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -60,6 +62,7 @@ namespace DevIO.Api.Controllers
         }
 
         [HttpPut("{id:guid}")]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Put))]
         public async Task<ActionResult> Atualizar(Guid id, FornecedorViewModel fornecedorViewModel)
         {
 
@@ -73,9 +76,10 @@ namespace DevIO.Api.Controllers
         }
 
         [HttpDelete("{id:guid}")]
+        [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Delete))]
         public async Task<ActionResult> Excluir(Guid id)
         {
-            return Accepted();
+            return Ok();
         }
 
     }
