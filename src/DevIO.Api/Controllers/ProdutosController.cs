@@ -26,7 +26,7 @@ namespace DevIO.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProdutoViewModel>>> ObterTodos()
         {
-            var produtosViewModel =  mapper.Map<IEnumerable<ProdutoViewModel>>(await produtoRepository.ObterProdutosFornecedores());
+            var produtosViewModel = mapper.Map<IEnumerable<ProdutoViewModel>>(await produtoRepository.ObterProdutosFornecedores());
 
             return CustomResponse(produtosViewModel);
         }
@@ -56,6 +56,32 @@ namespace DevIO.Api.Controllers
             return CustomResponse(produtoViewModel);
         }
 
+
+        [HttpPost]
+        [Route("adicionar-formfile")]
+        public async Task<ActionResult<ProdutoViewModel>> AdicionarAlternativo(ProdutoImagemViewModel produtoImagemViewModel)
+        {
+            var imgPrefix = $"{Guid.NewGuid()}_";
+
+            var uploadArquivoSucesso =
+                await UploadArquivoAlternativo(produtoImagemViewModel.ImagemUpload, imgPrefix);
+
+            if (uploadArquivoSucesso)
+                await produtoService.Adicionar(mapper.Map<Produto>(produtoImagemViewModel));
+
+            produtoImagemViewModel.Imagem = imgPrefix + produtoImagemViewModel.ImagemUpload.FileName;
+            return CustomResponse(produtoImagemViewModel);
+        }
+
+
+        [RequestSizeLimit(40000000)]
+        [HttpPost("imagem")]
+        public async Task<ActionResult> AdicionarImagem(IFormFile file)
+        {
+            return Ok();
+        }
+
+
         [HttpDelete("id:guid")]
         public async Task<ActionResult<IEnumerable<ProdutoViewModel>>> Remover(Guid id)
         {
@@ -72,7 +98,7 @@ namespace DevIO.Api.Controllers
         #region Metodos Privados
         private bool UploadArquivo(string arquivo64, string imgNome)
         {
-            if(string.IsNullOrEmpty(arquivo64) || string.IsNullOrEmpty(imgNome))
+            if (string.IsNullOrEmpty(arquivo64) || string.IsNullOrEmpty(imgNome))
             {
                 NotificarErro("Forneça uma imagem e o nome dela para esse produto!");
                 return false;
@@ -89,6 +115,31 @@ namespace DevIO.Api.Controllers
             }
 
             System.IO.File.WriteAllBytes(filePath, imagemDataByteArray);
+            return true;
+
+        }
+
+        private async Task<bool> UploadArquivoAlternativo(IFormFile arquivo, string imgPrefixo)
+        {
+            if (arquivo == null || arquivo.Length == 0)
+            {
+                NotificarErro("Forneça uma imagem para este produtoo!");
+                return false;
+            }
+
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/imagens", imgPrefixo + arquivo.FileName);
+
+            if (System.IO.File.Exists(filePath))
+            {
+                NotificarErro("Já existe um arquivo com esse nome!");
+                return false;
+            }
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await arquivo.CopyToAsync(stream);
+            }
+
             return true;
 
         }
