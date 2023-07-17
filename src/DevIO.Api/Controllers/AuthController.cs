@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using DevIO.Api.Configuration;
 using DevIO.Api.ViewModels;
 using DevIO.Business.Intefaces;
@@ -48,7 +50,7 @@ namespace DevIO.Api.Controllers
             if (result.Succeeded)
             {
                 await signInManager.SignInAsync(usuario, isPersistent: false);
-                return CustomResponse(GerarJwt());
+                return CustomResponse(await GerarJwt(usuario.Email));
             }
 
             foreach (var erro in result.Errors)
@@ -71,7 +73,7 @@ namespace DevIO.Api.Controllers
                 lockoutOnFailure: true);
 
             if (result.Succeeded)
-                return CustomResponse(GerarJwt());
+                return CustomResponse(await GerarJwt(loginUsuario.Email));
 
             if(result.IsLockedOut)
             {
@@ -84,14 +86,33 @@ namespace DevIO.Api.Controllers
         }
 
 
-        private string GerarJwt()
+        private async Task<string> GerarJwt(string email)
         {
+
+            var user = await userManager.FindByEmailAsync(email);
+            var claims = await userManager.GetClaimsAsync(user);
+            var roles = await userManager.GetRolesAsync(user);
+
+
+            claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, ToUnixEpochDate(DateTime.UtcNow).ToString()));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.UtcNow).ToString(), ClaimValueTypes.Integer64));
+
+            foreach (var role in roles)
+                claims.Add(new Claim("Role", role));
+
+            var identityClaims = new ClaimsIdentity();
+            identityClaims.AddClaims(claims);
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = System.Text.Encoding.ASCII.GetBytes(appSettings.Secret!);
             var token = tokenHandler.CreateToken(new SecurityTokenDescriptor
             {
                 Issuer = appSettings.Emissor,
                 Audience = appSettings.ValidoEm,
+                Subject = identityClaims,
                 Expires = DateTime.UtcNow.AddHours(appSettings.ExpiracaoHoras),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             });
@@ -99,6 +120,10 @@ namespace DevIO.Api.Controllers
             var encodedToken = tokenHandler.WriteToken(token);
             return encodedToken;
         }
+
+
+        private static long ToUnixEpochDate(DateTime date)
+          => (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero)).TotalSeconds);
     }
 }
 

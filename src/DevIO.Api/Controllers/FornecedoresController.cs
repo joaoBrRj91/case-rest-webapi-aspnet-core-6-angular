@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
+using DevIO.Api.Extensions;
 using DevIO.Api.ViewModels;
 using DevIO.Business.Intefaces;
 using DevIO.Business.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DevIO.Api.Controllers
 {
 
+    [Authorize]
     [Route("api/[controller]")]
     //[ApiConventionType(typeof(DefaultApiConventions))]
     public class FornecedoresController : MainController
@@ -55,6 +58,7 @@ namespace DevIO.Api.Controllers
 
 
         //TODO : Teste utilizando o CustomResponse
+        [ClaimsAuthorize(claimName: "Fornecedor",claimValue: "Adicionar")]
         [HttpPost]
         //[ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Post))]
         public async Task<ActionResult<FornecedorViewModel>> Adicionar(FornecedorViewModel fornecedorViewModel)
@@ -76,6 +80,7 @@ namespace DevIO.Api.Controllers
         }
 
 
+        [ClaimsAuthorize(claimName: "Fornecedor", claimValue: "Atualizar")]
         [HttpPut("{id:guid}")]
         [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Put))]
         public async Task<ActionResult> Atualizar(Guid id, FornecedorViewModel fornecedorViewModel)
@@ -91,6 +96,7 @@ namespace DevIO.Api.Controllers
         }
 
 
+        [ClaimsAuthorize(claimName: "Fornecedor", claimValue: "Excluir")]
         [HttpDelete("{id:guid}")]
         [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Delete))]
         public async Task<ActionResult> Excluir(Guid id)
@@ -107,6 +113,7 @@ namespace DevIO.Api.Controllers
         }
 
 
+        [ClaimsAuthorize(claimName: "Fornecedor", claimValue: "Atualizar")]
         [HttpGet("atualizar-endereco/{id:guid}")]
         [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Put))]
         public async Task<ActionResult<EnderecoViewModel>> AtualizarEndereco(Guid id, EnderecoViewModel enderecoViewModel)

@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DevIO.Api.Controllers
 {
-    [Authorize]
     [Route("api/produtos")]
     public class ProdutosController : MainController
     {
@@ -25,7 +24,6 @@ namespace DevIO.Api.Controllers
             this.mapper = mapper;
         }
 
-        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProdutoViewModel>>> ObterTodos()
         {
