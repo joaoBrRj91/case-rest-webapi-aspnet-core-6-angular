@@ -1,8 +1,12 @@
 ﻿using System;
+using System.IdentityModel.Tokens.Jwt;
+using DevIO.Api.Configuration;
 using DevIO.Api.ViewModels;
 using DevIO.Business.Intefaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DevIO.Api.Controllers
 {
@@ -13,14 +17,17 @@ namespace DevIO.Api.Controllers
         private readonly INotificador notificador;
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly UserManager<IdentityUser> userManager;
+        private readonly AppSettings appSettings;
 
         public AuthController(INotificador notificador,
             SignInManager<IdentityUser> signInManager,
-            UserManager<IdentityUser> userManager) : base(notificador)
+            UserManager<IdentityUser> userManager,
+            IOptions<AppSettings> options) : base(notificador)
         {
             this.notificador = notificador;
             this.signInManager = signInManager;
             this.userManager = userManager;
+            this.appSettings = options.Value;
         }
 
 
@@ -41,7 +48,7 @@ namespace DevIO.Api.Controllers
             if (result.Succeeded)
             {
                 await signInManager.SignInAsync(usuario, isPersistent: false);
-                return CustomResponse(registroUsuario);
+                return CustomResponse(GerarJwt());
             }
 
             foreach (var erro in result.Errors)
@@ -64,7 +71,7 @@ namespace DevIO.Api.Controllers
                 lockoutOnFailure: true);
 
             if (result.Succeeded)
-                return CustomResponse(loginUsuario);
+                return CustomResponse(GerarJwt());
 
             if(result.IsLockedOut)
             {
@@ -74,6 +81,23 @@ namespace DevIO.Api.Controllers
 
             NotificarErro("Usuario ou senha invalidos");
             return CustomResponse(loginUsuario);
+        }
+
+
+        private string GerarJwt()
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = System.Text.Encoding.ASCII.GetBytes(appSettings.Secret!);
+            var token = tokenHandler.CreateToken(new SecurityTokenDescriptor
+            {
+                Issuer = appSettings.Emissor,
+                Audience = appSettings.ValidoEm,
+                Expires = DateTime.UtcNow.AddHours(appSettings.ExpiracaoHoras),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            });
+
+            var encodedToken = tokenHandler.WriteToken(token);
+            return encodedToken;
         }
     }
 }
