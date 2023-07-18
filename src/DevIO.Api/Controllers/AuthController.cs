@@ -17,18 +17,23 @@ namespace DevIO.Api.Controllers
     public class AuthController : MainController
     {
         private readonly INotificador notificador;
+        private readonly IUser user;
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly UserManager<IdentityUser> userManager;
+        private readonly IOptions<AppSettings> options;
         private readonly AppSettings appSettings;
 
         public AuthController(INotificador notificador,
+            IUser user,
             SignInManager<IdentityUser> signInManager,
             UserManager<IdentityUser> userManager,
             IOptions<AppSettings> options) : base(notificador)
         {
             this.notificador = notificador;
+            this.user = user;
             this.signInManager = signInManager;
             this.userManager = userManager;
+            this.options = options;
             this.appSettings = options.Value;
         }
 

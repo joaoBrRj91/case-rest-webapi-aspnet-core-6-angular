@@ -1,4 +1,5 @@
 ﻿using System;
+using DevIO.Api.Extensions;
 using DevIO.Business.Intefaces;
 using DevIO.Business.Notificacoes;
 using DevIO.Business.Services;
@@ -20,7 +21,10 @@ namespace DevIO.Api.Configuration
 
 
             #region Base DI
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<INotificador, Notificador>();
+            services.AddScoped<IUser, AspNetUser>();
+
             #endregion
 
             #region Repositories
