@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DevIO.Api.Controllers;
 using DevIO.Api.Extensions;
 using DevIO.Api.ViewModels;
 using DevIO.Business.Intefaces;
@@ -6,11 +7,12 @@ using DevIO.Business.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DevIO.Api.Controllers
+namespace DevIO.Api.ApiVersioning.V1.Controllers
 {
 
     [Authorize]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/fornecedores")]
     //[ApiConventionType(typeof(DefaultApiConventions))]
     public class FornecedoresController : MainController
     {
@@ -32,6 +34,7 @@ namespace DevIO.Api.Controllers
             this.mapper = mapper;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         [ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Get))]
         public async Task<ActionResult<IEnumerable<FornecedorViewModel>>> ObterTodos()
@@ -59,7 +62,7 @@ namespace DevIO.Api.Controllers
 
         //TODO : Teste utilizando o CustomResponse
         //TODO:  Criar registros de claims nas tabelas identity
-        [ClaimsAuthorize(claimName: "Fornecedor",claimValue: "Adicionar")]
+        [ClaimsAuthorize(claimName: "Fornecedor", claimValue: "Adicionar")]
         [HttpPost]
         //[ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Post))]
         public async Task<ActionResult<FornecedorViewModel>> Adicionar(FornecedorViewModel fornecedorViewModel)

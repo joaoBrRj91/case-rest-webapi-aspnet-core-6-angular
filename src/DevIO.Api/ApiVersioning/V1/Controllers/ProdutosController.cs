@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
+using DevIO.Api.Controllers;
 using DevIO.Api.ViewModels;
 using DevIO.Business.Intefaces;
 using DevIO.Business.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DevIO.Api.Controllers
+namespace DevIO.Api.ApiVersioning.V1.Controllers
 {
     [Route("api/produtos")]
     public class ProdutosController : MainController

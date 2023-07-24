@@ -17,15 +17,34 @@ namespace DevIO.Api.Configuration
                 options.SuppressModelStateInvalidFilter = true;
             });
 
+
+            #region API Versioning
+            services.AddApiVersioning(options =>
+            {
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new ApiVersion(majorVersion: 1, minorVersion: 0);
+                options.ReportApiVersions = true;
+            });
+
+            services.AddVersionedApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'VVV";
+                options.SubstituteApiVersionInUrl = true;
+            });
+            #endregion
+
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen();
+
             services.AddCors(options =>
             {
 
-               /* options.AddDefaultPolicy(
-                   configurePolicy: corsBuilder => corsBuilder
-                   .AllowAnyOrigin()
-                   .AllowAnyMethod()
-                   .AllowAnyHeader()
-                   .AllowCredentials());*/
+                /* options.AddDefaultPolicy(
+                    configurePolicy: corsBuilder => corsBuilder
+                    .AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());*/
 
 
                 options.AddPolicy(
@@ -48,9 +67,6 @@ namespace DevIO.Api.Configuration
                     .AllowCredentials());
             });
 
-            services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen();
-
             services.AddAutoMapper(typeof(ApiConfig));
 
             return services;
@@ -61,8 +77,9 @@ namespace DevIO.Api.Configuration
 
             applicationBuilder.UseHttpsRedirection();
 
-            //applicationBuilder.UseCors("Development");
+            applicationBuilder.UseCors("Development");
 
+            applicationBuilder.UseAuthentication();
             applicationBuilder.UseAuthorization();
 
             applicationBuilder.MapControllers();

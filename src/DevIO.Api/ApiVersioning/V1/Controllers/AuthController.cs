@@ -10,12 +10,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Cors;
+using DevIO.Api.Controllers;
 
-namespace DevIO.Api.Controllers
+namespace DevIO.Api.ApiVersioning.V1.Controllers
 {
 
     [Route("api/auth")]
-   // [DisableCors]
+    // [DisableCors]
     public class AuthController : MainController
     {
         private readonly INotificador notificador;
@@ -36,7 +37,7 @@ namespace DevIO.Api.Controllers
             this.signInManager = signInManager;
             this.userManager = userManager;
             this.options = options;
-            this.appSettings = options.Value;
+            appSettings = options.Value;
         }
 
 
@@ -84,7 +85,7 @@ namespace DevIO.Api.Controllers
             if (result.Succeeded)
                 return CustomResponse(await GerarJwt(loginUsuario.Email));
 
-            if(result.IsLockedOut)
+            if (result.IsLockedOut)
             {
                 NotificarErro("Usuario temporariamente bloqueado por tentativas inválidas");
                 return CustomResponse(loginUsuario);
