@@ -58,6 +58,7 @@ namespace DevIO.Api.Controllers
 
 
         //TODO : Teste utilizando o CustomResponse
+        //TODO:  Criar registros de claims nas tabelas identity
         [ClaimsAuthorize(claimName: "Fornecedor",claimValue: "Adicionar")]
         [HttpPost]
         //[ApiConventionMethod(typeof(DefaultApiConventions), nameof(DefaultApiConventions.Post))]

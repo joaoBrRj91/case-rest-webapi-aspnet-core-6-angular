@@ -9,11 +9,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Cors;
 
 namespace DevIO.Api.Controllers
 {
 
     [Route("api/auth")]
+   // [DisableCors]
     public class AuthController : MainController
     {
         private readonly INotificador notificador;
@@ -38,6 +40,8 @@ namespace DevIO.Api.Controllers
         }
 
 
+        //TODO: Só funciona se não tiver nenhuma politica de cors configurada em program
+        //[EnableCors("Development")]
         [HttpPost]
         [Route("nova-conta")]
         public async Task<ActionResult> Registrar(RegistroUsuarioViewModel registroUsuario)

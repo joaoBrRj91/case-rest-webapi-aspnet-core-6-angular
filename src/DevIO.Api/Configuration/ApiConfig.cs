@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 
 namespace DevIO.Api.Configuration
 {
@@ -11,17 +12,38 @@ namespace DevIO.Api.Configuration
         {
             services.AddControllers().ConfigureApiBehaviorOptions(x => { x.SuppressMapClientErrors = true; });
 
-            services.Configure<ApiBehaviorOptions>(options => {
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
                 options.SuppressModelStateInvalidFilter = true;
             });
 
             services.AddCors(options =>
             {
+
+               /* options.AddDefaultPolicy(
+                   configurePolicy: corsBuilder => corsBuilder
+                   .AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader()
+                   .AllowCredentials());*/
+
+
                 options.AddPolicy(
                     name: "Development",
                     configurePolicy: corsBuilder => corsBuilder
                     .AllowAnyOrigin()
                     .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+
+
+                options.AddPolicy(
+                    name: "Production",
+                    configurePolicy: corsBuilder => corsBuilder
+                    .WithMethods("GET", "PUT")
+                    .WithOrigins("https://origin-permitida-cors")
+                    .SetIsOriginAllowedToAllowWildcardSubdomains()
+                    //.WithHeaders(HeaderNames.ContentType, "Application/json")
                     .AllowAnyHeader()
                     .AllowCredentials());
             });
@@ -39,7 +61,7 @@ namespace DevIO.Api.Configuration
 
             applicationBuilder.UseHttpsRedirection();
 
-            applicationBuilder.UseCors("Development");
+            //applicationBuilder.UseCors("Development");
 
             applicationBuilder.UseAuthorization();
 
