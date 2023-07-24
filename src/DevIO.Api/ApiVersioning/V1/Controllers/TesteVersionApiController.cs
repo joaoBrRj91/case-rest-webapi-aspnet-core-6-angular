@@ -15,7 +15,11 @@ namespace DevIO.Api.ApiVersioning.V1.Controllers
         }
 
 
-        public IActionResult AssemblyVersion => Ok(Assembly.GetExecutingAssembly().GetName().Version);
+        [HttpGet]
+        public IActionResult AssemblyVersion()
+        {
+            return Ok(Assembly.GetExecutingAssembly().GetName().Version);
+        }
     }
 }
 

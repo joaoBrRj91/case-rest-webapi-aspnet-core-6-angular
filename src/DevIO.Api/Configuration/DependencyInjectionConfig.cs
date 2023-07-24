@@ -6,6 +6,8 @@ using DevIO.Business.Services;
 using DevIO.Data.Context;
 using DevIO.Data.Repository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace DevIO.Api.Configuration
 {
@@ -21,6 +23,7 @@ namespace DevIO.Api.Configuration
 
 
             #region Base DI
+            services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<INotificador, Notificador>();
             services.AddScoped<IUser, AspNetUser>();

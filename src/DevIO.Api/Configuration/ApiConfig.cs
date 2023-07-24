@@ -34,8 +34,9 @@ namespace DevIO.Api.Configuration
             #endregion
 
             services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen();
 
+
+            #region CORS
             services.AddCors(options =>
             {
 
@@ -52,8 +53,8 @@ namespace DevIO.Api.Configuration
                     configurePolicy: corsBuilder => corsBuilder
                     .AllowAnyOrigin()
                     .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials());
+                    .AllowAnyHeader());
+                // .AllowCredentials());
 
 
                 options.AddPolicy(
@@ -63,28 +64,37 @@ namespace DevIO.Api.Configuration
                     .WithOrigins("https://origin-permitida-cors")
                     .SetIsOriginAllowedToAllowWildcardSubdomains()
                     //.WithHeaders(HeaderNames.ContentType, "Application/json")
-                    .AllowAnyHeader()
-                    .AllowCredentials());
+                    .AllowAnyHeader());
+                    //.AllowCredentials());
             });
+            #endregion
 
             services.AddAutoMapper(typeof(ApiConfig));
 
             return services;
         }
 
-        public static IApplicationBuilder UseApplicationStartupConfig(this WebApplication applicationBuilder)
+        public static IApplicationBuilder UseApplicationStartupConfig(this WebApplication applicationBuilder, IWebHostEnvironment environment)
         {
 
-            applicationBuilder.UseHttpsRedirection();
+            // Configure the HTTP request pipeline.
+            if (environment.IsDevelopment())
+            {
+                applicationBuilder.UseCors("Development");
+            }
+            else
+            {
+                applicationBuilder.UseCors("Production");
+                applicationBuilder.UseHsts();
 
-            applicationBuilder.UseCors("Development");
+            }
+
+            applicationBuilder.UseHttpsRedirection();
 
             applicationBuilder.UseAuthentication();
             applicationBuilder.UseAuthorization();
 
             applicationBuilder.MapControllers();
-
-            applicationBuilder.Run();
 
             return applicationBuilder;
         }

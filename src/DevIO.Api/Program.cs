@@ -1,9 +1,5 @@
 ﻿using DevIO.Api.Configuration;
-using DevIO.Data.Context;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,26 +7,17 @@ builder.Services.AddIdentityConfiguration(builder.Configuration);
 
 builder.Services.ResolveDependencies(builder.Configuration);
 
-
 builder.Services.AddWebApiConfig();
 
+builder.Services.AddSwaggerConfig();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseCors("Development");
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-else
-{
-    app.UseCors("Production");
-    app.UseHsts();
+app.UseApplicationStartupConfig(app.Environment);
 
-}
+var apiVersionDescriptionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
 
+app.UseSwaggerConfig(app.Environment, apiVersionDescriptionProvider);
 
-app.UseApplicationStartupConfig();
+app.Run();
 
