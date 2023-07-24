@@ -39,6 +39,8 @@ namespace DevIO.Api.Configuration
 
             applicationBuilder.UseHttpsRedirection();
 
+            applicationBuilder.UseCors("Development");
+
             applicationBuilder.UseAuthorization();
 
             applicationBuilder.MapControllers();
