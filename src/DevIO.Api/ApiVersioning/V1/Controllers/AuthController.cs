@@ -15,8 +15,8 @@ using DevIO.Api.Controllers;
 namespace DevIO.Api.ApiVersioning.V1.Controllers
 {
 
-    [Route("api/auth")]
-    // [DisableCors]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/auth")]    // [DisableCors]
     public class AuthController : MainController
     {
         private readonly INotificador notificador;
@@ -24,19 +24,22 @@ namespace DevIO.Api.ApiVersioning.V1.Controllers
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly UserManager<IdentityUser> userManager;
         private readonly IOptions<AppSettings> options;
+        private readonly ILogger<AuthController> logger;
         private readonly AppSettings appSettings;
 
         public AuthController(INotificador notificador,
             IUser user,
             SignInManager<IdentityUser> signInManager,
             UserManager<IdentityUser> userManager,
-            IOptions<AppSettings> options) : base(notificador)
+            IOptions<AppSettings> options,
+            ILogger<AuthController> logger) : base(notificador)
         {
             this.notificador = notificador;
             this.user = user;
             this.signInManager = signInManager;
             this.userManager = userManager;
             this.options = options;
+            this.logger = logger;
             appSettings = options.Value;
         }
 
@@ -59,6 +62,7 @@ namespace DevIO.Api.ApiVersioning.V1.Controllers
             var result = await userManager.CreateAsync(usuario, registroUsuario.Senha);
             if (result.Succeeded)
             {
+                logger.LogInformation($"Usuário {usuario.UserName} cadastrado com sucesso");
                 await signInManager.SignInAsync(usuario, isPersistent: false);
                 return CustomResponse(await GerarJwt(usuario.Email));
             }

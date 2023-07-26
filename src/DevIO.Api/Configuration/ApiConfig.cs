@@ -1,4 +1,5 @@
 ﻿using System;
+using DevIO.Api.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -88,6 +89,9 @@ namespace DevIO.Api.Configuration
                 applicationBuilder.UseHsts();
 
             }
+
+            //TODO: Middleware que será chamado antes do middleware de processamento do request no pipeline do asp net.
+            applicationBuilder.UseMiddleware<ExceptionMiddleware>();
 
             applicationBuilder.UseHttpsRedirection();
 
