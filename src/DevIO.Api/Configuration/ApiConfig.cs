@@ -1,8 +1,10 @@
 ﻿using System;
 using DevIO.Api.Extensions;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using HealthChecks.UI.Client;
 
 namespace DevIO.Api.Configuration
 {
@@ -93,13 +95,32 @@ namespace DevIO.Api.Configuration
             //TODO: Middleware que será chamado antes do middleware de processamento do request no pipeline do asp net.
             applicationBuilder.UseMiddleware<ExceptionMiddleware>();
 
-            applicationBuilder.UseHttpsRedirection();
+            //TODO: Comentado para testar localmente sem ocorrer erro de ssl devido a falta de certificado. Descomentar quando for para prd
+            //applicationBuilder.UseHttpsRedirection();
+            applicationBuilder.UseRouting();
 
             applicationBuilder.UseAuthentication();
             applicationBuilder.UseAuthorization();
 
-            applicationBuilder.MapControllers();
+            applicationBuilder.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapHealthChecks("/api/hc", new HealthCheckOptions()
+                {
+                    Predicate = _ => true,
+                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                });
+                endpoints.MapHealthChecksUI(options =>
+                {
+                    options.UIPath = "/api/hc-ui";
+                    options.ResourcesPath = "/api/hc-ui-resources";
 
+                    options.UseRelativeApiPath = false;
+                    options.UseRelativeResourcesPath = false;
+                    options.UseRelativeWebhookPath = false;
+                });
+
+            });
             return applicationBuilder;
         }
     }

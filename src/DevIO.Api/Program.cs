@@ -11,7 +11,7 @@ builder.Services.AddWebApiConfig();
 
 builder.Services.AddSwaggerConfig();
 
-builder.Services.AddLoggingConfig();
+builder.Services.AddLoggingConfig(builder.Configuration);
 
 var app = builder.Build();
 

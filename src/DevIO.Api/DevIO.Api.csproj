@@ -15,6 +15,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
     <PackageReference Include="Elmah.Io.AspNetCore" Version="5.0.56" />
     <PackageReference Include="Elmah.Io.Extensions.Logging" Version="5.0.43" />
+    <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="6.0.2" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI" Version="6.0.5" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="6.0.5" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="6.0.5" />
+    <PackageReference Include="Elmah.Io.AspNetCore.HealthChecks" Version="5.0.56" />
   </ItemGroup>
 
   <ItemGroup>
